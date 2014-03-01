@@ -1,7 +1,5 @@
 #! /bin/sh
 
-sudo bash
-
 KTREE="3.10.y"
 KVERSION=`uname -r`
 
