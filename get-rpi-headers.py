@@ -21,7 +21,7 @@ def collectFiles(fullPath, path):
 	# If the length of list is 1, then list[0] is a file
 	if len(list) == 1:
 		# Download file from GitHub
-		os.system('wget https://github.com/raspberrypi/linux/raw/' + GitHubBranch + fullPath)
+		os.system('wget https://github.com/raspberrypi/linux/raw/' + GitHubBranch + '/' + fullPath)
 	else:
 		# If the dir does not exist, create it.
 		if not os.path.exists(list[0]):
