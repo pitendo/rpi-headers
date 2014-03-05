@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import os
 
-HeaderFilesList = header_files.list
+HeaderFilesList = 'header_files.list'
 GitHubBranch = 'rpi-3.10.y'
 
 # Join elements in the list to create a path
