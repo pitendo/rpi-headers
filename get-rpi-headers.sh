@@ -11,6 +11,8 @@ wget  https://github.com/raspberrypi/linux/tarball/rpi-$KTREE
 echo "### Uncompressing kernel source ###"
 tar xzf rpi-$KTREE
 
+
+
 mv raspberrypi-linux-* linux-headers-$KVERSION
 rm -fr rpi-$KTREE
 
