@@ -104,7 +104,7 @@ lhfolder = 'linux-headers-' + kversion
 if os.path.exists(lhfolder):
 	# Prompt user that it already exists and exit.
 	print 'The folder "' + lhfolder + '" already exists!'
-	return 0
+	return
 
 # Create folder for Linux headers.
 os.mkdir(lhfolder)
