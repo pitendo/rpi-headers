@@ -7,7 +7,11 @@ GitHubKernelSourceTarballURL = 'https://github.com/raspberrypi/linux/tarball/'
 KernelSourcePath = ''
 LinuxHeaderPath = ''
 
-# Execute linux terminal command and return response
+# Execute linux terminal command and return response.
+#
+# @param cmd The Linux termioal command to be executed
+# @return The response from the command
+#
 def executeCommandReturnResponse(cmd):
 	# Create temporary file.
 	(fd, filename) = tempfile.mkstemp()
@@ -28,7 +32,11 @@ def executeCommandReturnResponse(cmd):
 	else:
 		return lines
 
-# Join elements in the list to create a path
+# Join elements in the list to create a path.
+#
+# @param list List of elements to be joined
+# @result Resulting path
+#
 def joinPath(list):
 	str = list[0]
 	list.pop(0)
@@ -37,15 +45,19 @@ def joinPath(list):
 
 	return str
 
-# Recursive function that create folder structure and copy kernel source file to new directory
-def copyFile(fullPath, path):
+# Recursive function that create folder structure and copy kernel source file to new directory.
+#
+# @param fullPath Full path to the source file
+# @param path Minimized path
+#
+def moveFile(fullPath, path):
 	# Split file path
 	list = path.strip().split('/')
 
 	# If the length of list is 1, then list[0] is a file.
 	if len(list) == 1:
-		# Copy file to new folder
-		os.system('cp '  + KernelSourcePath + fullPath + ' .')
+		# Move file to new folder
+		os.system('mv '  + KernelSourcePath + fullPath + ' .')
 	else:
 		# If the dir does not exist, create it.
 		if not os.path.exists(list[0]):
@@ -56,10 +68,13 @@ def copyFile(fullPath, path):
 		list.pop(0)
 
 		# Call collectFiles recursively with the rest of the path.
-		collectFiles(fullPath, joinPath(list))
+		moveFile(fullPath, joinPath(list))
 
-
-def copyAllFiles(file):
+# Go through the list of header files needed to create the Linux headers.
+#
+# @param file The file that list all needed files
+#
+def moveAllListedFiles(file):
 	# Open the file.
 	f = open(file)
 	
@@ -68,7 +83,7 @@ def copyAllFiles(file):
 		# Go to base of Linux header folder.
 		os.chdir(LinuxHeaderPath)
 		# Build folder structure and collect file listed one the line.
-		collectFiles(line, line)
+		moveFile(line, line)
 
 
 #   __  __       _
@@ -98,7 +113,7 @@ os.mkdir(lhfolder)
 pwd = os.getcwd()
 
 # Save oath to Linux header folder.
-lhpath = pwd + '/' + lhfolder
+LinuxHeaderPath = pwd + '/' + lhfolder + '/'
 
 # Determine which GitHub branch to download from.
 numbers = kversion.split('.')
@@ -112,6 +127,8 @@ os.system('wget ' + GitHubKernelSourceTarballURL + GitHubBranch)
 os.system('tar -xzf ' + GitHubBranch + ' -C ' + tempFolder)
 
 # Store path to base dir of kernel source.
-kspath = pwd + '/' + tempFolder
+KernelSourcePath = pwd + '/' + tempFolder + '/'
 
-processFilesList(kspath)
+# Copy all files listed in the header files list.
+moveAllListedFiles(HeaderFilesList)
+
