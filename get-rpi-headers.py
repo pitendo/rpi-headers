@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import os, tempfile
+import os, sys, tempfile
 
 HeaderFilesList = os.path.realpath('header_files.list')
 GitHubBranch = 'rpi-'
@@ -104,7 +104,7 @@ lhfolder = 'linux-headers-' + kversion
 if os.path.exists(lhfolder):
 	# Prompt user that it already exists and exit.
 	print 'The folder "' + lhfolder + '" already exists!'
-	return
+	exit()
 
 # Create folder for Linux headers.
 os.mkdir(lhfolder)
