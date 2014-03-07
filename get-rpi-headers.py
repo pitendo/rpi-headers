@@ -17,7 +17,7 @@ def executeCommandReturnResponse(cmd):
 	(fd, filename) = tempfile.mkstemp()
 
 	# Execute command
-	os.system(cmd + ' > ' + tempfile)
+	os.system(cmd + ' > ' + filename)
 	
 	# Open temporary file and read all lines.
 	f.open(filename)
