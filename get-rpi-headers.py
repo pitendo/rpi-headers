@@ -15,6 +15,8 @@ LinuxHeaderPath = ''
 def executeCommandReturnResponse(cmd):
 	# Create temporary file.
 	(fd, filename) = tempfile.mkstemp()
+	
+	filename = filename.split('/')[0]
 
 	# Execute command
 	os.system(cmd + ' > ' + filename)
