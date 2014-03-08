@@ -1,11 +1,15 @@
 #!/usr/bin/python
 import os, sys, tempfile
 
+WorkingDirectory = os.getcwd()
 HeaderFilesList = os.path.realpath('header_files.list')
 GitHubBranch = 'rpi-'
 GitHubKernelSourceTarballURL = 'https://github.com/raspberrypi/linux/tarball/'
 KernelSourcePath = ''
 LinuxHeaderPath = ''
+LinuxHeaderVersion = ''
+TempFile = ''
+TempFolder = ''
 
 # Execute linux terminal command and return response.
 #
@@ -13,11 +17,7 @@ LinuxHeaderPath = ''
 # @return The response from the command
 #
 def executeCommandReturnResponse(cmd):
-	# Create temporary file.
-	(fd, filename) = tempfile.mkstemp()
-	
-	filename = filename.split('/')[0]
-
+	filename = global TempFile
 	# Execute command
 	os.system(cmd + ' > ' + filename)
 	
@@ -25,9 +25,6 @@ def executeCommandReturnResponse(cmd):
 	f.open(filename)
 	lines = f.readlines()
 	f.close()
-
-	# Delete temporary file
-	os.remove(filename)
 
 	if len(lines) == 1:
 		return lines[0].strip()
@@ -87,6 +84,9 @@ def moveAllListedFiles(file):
 		# Build folder structure and collect file listed one the line.
 		moveFile(line, line)
 
+	# Return to working directory.
+	os.chdir(WorkingDirectory)
+
 
 #   __  __       _
 #  |  \/  |     (_)
@@ -111,11 +111,12 @@ if os.path.exists(lhfolder):
 # Create folder for Linux headers.
 os.mkdir(lhfolder)
 
-# Store current working directory.
-pwd = os.getcwd()
+# Create temporary file.
+(fd, filename) = tempfile.mkstemp()
+TempFile = filename.split('/')[2]
 
 # Save oath to Linux header folder.
-LinuxHeaderPath = pwd + '/' + lhfolder + '/'
+LinuxHeaderPath = WorkingDirectory + '/' + lhfolder + '/'
 
 # Determine which GitHub branch to download from.
 numbers = kversion.split('.')
@@ -125,12 +126,22 @@ GitHubBranch = GitHubBranch + numbers[0] + '.' + numbers[1] + '.y'
 os.system('wget ' + GitHubKernelSourceTarballURL + GitHubBranch)
 
 # Unzip Linux kernel source.
-(fd, tempFolder) = tempfile.mkdtemp()
-os.system('tar -xzf ' + GitHubBranch + ' -C ' + tempFolder)
+TempFolder = tempfile.mkdtemp().split('/')[2]
+os.mkdir(tempfolder)
+os.system('tar -xzf ' + GitHubBranch + '-C ' + TempFolder)
 
 # Store path to base dir of kernel source.
-KernelSourcePath = pwd + '/' + tempFolder + '/'
+KernelSourcePath = pwd + '/' + TempFolder + '/' + executeCommandReturnResponse('ls ' + TempFolder + '/raspberrypi-linux-*') + '/'
 
 # Copy all files listed in the header files list.
 moveAllListedFiles(HeaderFilesList)
+
+# Compress Linux header files
+os.system('tar czf ' + lhfolder + '.tar.gz ' + lhfolder)
+
+# Remove temporary files, folders and archives.
+os.remove(TempFile)
+os.system('rm -r ' + TempFolder)
+os.remove(GitHubBranch)
+
 
